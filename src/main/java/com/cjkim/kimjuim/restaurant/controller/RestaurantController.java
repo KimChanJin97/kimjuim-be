@@ -1,0 +1,31 @@
+package com.cjkim.kimjuim.restaurant.controller;
+
+import com.cjkim.kimjuim.restaurant.dto.RestaurantDetailResponse;
+import com.cjkim.kimjuim.restaurant.dto.RestaurantNearbyResponses;
+import com.cjkim.kimjuim.restaurant.service.RestaurantService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/restaurants")
+@RequiredArgsConstructor
+public class RestaurantController {
+
+    private final RestaurantService restaurantService;
+
+    @GetMapping("/nearby")
+    public RestaurantNearbyResponses getRestaurantsNearby(
+            @RequestParam double x,
+            @RequestParam double y,
+            @RequestParam(defaultValue = "100") double d
+    ) {
+        return restaurantService.findRestaurantsNearby(x, y, d);
+    }
+
+    @GetMapping("/{rid}")
+    public RestaurantDetailResponse getRestaurantDetail(
+            @PathVariable String rid
+    ) {
+        return restaurantService.findRestaurantDetail(rid);
+    }
+}
