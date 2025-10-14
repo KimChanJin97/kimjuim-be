@@ -4,6 +4,8 @@ import com.cjkim.kimjuim.restaurant.dto.RestaurantDetailResponse;
 import com.cjkim.kimjuim.restaurant.dto.RestaurantNearbyResponses;
 import com.cjkim.kimjuim.restaurant.repository.RestaurantRepository;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +20,11 @@ public class RestaurantService {
     public RestaurantNearbyResponses findRestaurantsNearby(
             double x,
             double y,
-            double distance
+            double d,
+            String[] ex
     ) {
         return RestaurantNearbyResponses.from(
-                restaurantRepository.findRestaurantsNearby(x, y, distance),
+                restaurantRepository.findRestaurantsNearby(x, y, d, ex),
                 LocalDateTime.now());
     }
 

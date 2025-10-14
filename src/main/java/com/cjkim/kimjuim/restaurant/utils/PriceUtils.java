@@ -6,15 +6,15 @@ import java.text.DecimalFormat;
 
 public class PriceUtils {
 
-    private static final String NO_PRICE = "0";
     private static final String NO_MENU_RECOMMENDED = "정보없음";
     private static final String PRICE_FORMAT = "%s원";
     private static final DecimalFormat COMMA_FORMATTER = new DecimalFormat("#,###");
+    private static final String RANGE = "~";
 
     public static String getRecommendedPrice(Restaurant restaurant) {
         Menu menu = restaurant.getMenus().stream()
                 .filter(m -> m.isRecommended() == true)
-                .filter(m -> m.getPrice() != null && !m.getPrice().equals(NO_PRICE))
+                .filter(m -> m.getPrice() != null)
                 .findFirst()
                 .orElse(null);
 
@@ -27,7 +27,13 @@ public class PriceUtils {
     }
 
     public static String formatPrice(String priceStr) {
-        int priceInt = Integer.parseInt(priceStr.split("~")[0].trim());
-        return String.format(PRICE_FORMAT, COMMA_FORMATTER.format(priceInt));
+        if (priceStr == null) {
+            return NO_MENU_RECOMMENDED;
+        }
+        if (priceStr.contains(RANGE)) {
+            int priceInt = Integer.parseInt(priceStr.split("~")[0].trim());
+            return String.format(PRICE_FORMAT, COMMA_FORMATTER.format(priceInt));
+        }
+        return String.format(PRICE_FORMAT, priceStr);
     }
 }

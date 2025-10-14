@@ -1,7 +1,6 @@
 package com.cjkim.kimjuim.restaurant.utils;
 
 import com.cjkim.kimjuim.restaurant.domain.Review;
-import com.cjkim.kimjuim.restaurant.dto.ReviewResponse;
 
 public class ReviewUtils {
 

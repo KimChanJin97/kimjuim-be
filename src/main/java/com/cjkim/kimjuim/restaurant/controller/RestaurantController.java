@@ -6,6 +6,8 @@ import com.cjkim.kimjuim.restaurant.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/restaurants")
 @RequiredArgsConstructor
@@ -17,9 +19,10 @@ public class RestaurantController {
     public RestaurantNearbyResponses getRestaurantsNearby(
             @RequestParam double x,
             @RequestParam double y,
-            @RequestParam(defaultValue = "100") double d
+            @RequestParam(defaultValue = "100") double d,
+            @RequestParam(required = false) String[] ex
     ) {
-        return restaurantService.findRestaurantsNearby(x, y, d);
+        return restaurantService.findRestaurantsNearby(x, y, d, ex);
     }
 
     @GetMapping("/{rid}")

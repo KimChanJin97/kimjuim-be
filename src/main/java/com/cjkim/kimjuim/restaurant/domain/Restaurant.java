@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
@@ -46,18 +47,22 @@ public class Restaurant {
     private String roadAddress;
 
     @Builder.Default
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
     List<RestaurantImage> restaurantImages = new ArrayList<>();
 
     @Builder.Default
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
     List<Menu> menus = new ArrayList<>();
 
     @Builder.Default
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
     List<Review> reviews = new ArrayList<>();
 
     @Builder.Default
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
     List<BizHour> bizHours = new ArrayList<>();
 }
