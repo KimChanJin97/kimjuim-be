@@ -1,21 +1,15 @@
 package com.cjkim.kimjuim.restaurant.dto;
 
+import java.util.Map;
+
 public record RestaurantImageDto(
         Long id,
         String url
 ) {
-    public static RestaurantImageDto of(Long id, String url) {
-        return new RestaurantImageDto(id, url);
-    }
-
-    public static RestaurantImageDto from(Object[] row, int startIndex) {
+    public static RestaurantImageDto from(Map<String, Object> row) {
         return new RestaurantImageDto(
-                (Long) row[startIndex],       // image_id
-                (String) row[startIndex + 1]  // image_url
+                (Long) row.get("image_id"),
+                (String) row.get("image_url")
         );
-    }
-
-    public static RestaurantImageDto from(Object[] row) {
-        return from(row, 14);
     }
 }

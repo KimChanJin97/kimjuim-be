@@ -11,22 +11,24 @@ import com.cjkim.kimjuim.restaurant.utils.PriceUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class RestaurantQueryMapper {
 
     public List<RestaurantNearbyResponse> mapToRestaurantDtos(
-            List<Object[]> queryResults,
+            List<Map<String, Object>> queryResults,
             LocalDateTime now
     ) {
-
         Map<Long, TempRestaurantData> restaurantDataMap = new LinkedHashMap<>();
 
         // 1단계: 데이터 수집
-        for (Object[] row : queryResults) {
-            Long restaurantId = (Long) row[0];
+        for (Map<String, Object> row : queryResults) {
+            Long restaurantId = (Long) row.get("id");
 
             TempRestaurantData tempData = restaurantDataMap.computeIfAbsent(
                     restaurantId,
@@ -41,7 +43,7 @@ public class RestaurantQueryMapper {
             );
 
             // Menu 정보 추가
-            if (row[8] != null) {
+            if (row.get("menu_id") != null) {
                 MenuDto menu = MenuDto.from(row);
                 if (tempData.menus.stream().noneMatch(m -> m.id().equals(menu.id()))) {
                     tempData.menus.add(menu);
@@ -49,7 +51,7 @@ public class RestaurantQueryMapper {
             }
 
             // RestaurantImage 정보 추가
-            if (row[14] != null) {
+            if (row.get("image_id") != null) {
                 RestaurantImageDto image = RestaurantImageDto.from(row);
                 if (tempData.images.stream().noneMatch(img -> img.id().equals(image.id()))) {
                     tempData.images.add(image);
@@ -57,7 +59,7 @@ public class RestaurantQueryMapper {
             }
 
             // BizHour 정보 추가
-            if (row[16] != null) {
+            if (row.get("biz_hour_id") != null) {
                 BizHourDto bizHour = BizHourDto.from(row);
                 if (tempData.bizHours.stream().noneMatch(bh -> bh.id().equals(bizHour.id()))) {
                     tempData.bizHours.add(bizHour);
@@ -72,8 +74,9 @@ public class RestaurantQueryMapper {
     }
 
     private RestaurantNearbyResponse createFinalResponse(
-            TempRestaurantData tempData, LocalDateTime now) {
-
+            TempRestaurantData tempData,
+            LocalDateTime now
+    ) {
         RestaurantNearbyResponse original = tempData.response;
 
         // 기존 Utils 함수 재사용!

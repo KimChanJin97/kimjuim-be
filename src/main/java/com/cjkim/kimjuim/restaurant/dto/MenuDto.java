@@ -1,5 +1,7 @@
 package com.cjkim.kimjuim.restaurant.dto;
 
+import java.util.Map;
+
 public record MenuDto(
         Long id,
         String name,
@@ -8,29 +10,14 @@ public record MenuDto(
         boolean isRecommended,
         int menuIdx
 ) {
-    public static MenuDto of(
-            Long id,
-            String name,
-            String price,
-            String description,
-            boolean isRecommended,
-            int menuIdx
-    ) {
-        return new MenuDto(id, name, price, description, isRecommended, menuIdx);
-    }
-
-    public static MenuDto from(Object[] row, int startIndex) {
+    public static MenuDto from(Map<String, Object> row) {
         return new MenuDto(
-                (Long) row[startIndex],           // menu_id
-                (String) row[startIndex + 1],     // menu_name
-                (String) row[startIndex + 2],     // price
-                (String) row[startIndex + 3],     // description
-                (Boolean) row[startIndex + 4],    // is_recommended
-                (Integer) row[startIndex + 5]     // menu_idx
+                (Long) row.get("menu_id"),
+                (String) row.get("menu_name"),
+                (String) row.get("price"),
+                (String) row.get("description"),
+                (Boolean) row.get("is_recommended"),
+                (Integer) row.get("menu_idx")
         );
-    }
-
-    public static MenuDto from(Object[] row) {
-        return from(row, 8);
     }
 }

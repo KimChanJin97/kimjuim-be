@@ -2,6 +2,7 @@ package com.cjkim.kimjuim.restaurant.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public record RestaurantNearbyResponse(
         Long id,
@@ -17,20 +18,20 @@ public record RestaurantNearbyResponse(
         String menus,               // 전처리된 메뉴 문자열
         String bizHour              // 전처리된 영업시간
 ) {
-    public static RestaurantNearbyResponse from(Object[] row) {
+    public static RestaurantNearbyResponse from(Map<String, Object> row) {
         return new RestaurantNearbyResponse(
-                (Long) row[0],
-                (String) row[1],
-                (String) row[2],
-                ((Number) row[3]).doubleValue(),
-                ((Number) row[4]).doubleValue(),
-                (String) row[5],
-                (String) row[6],
-                (String) row[7],
-                null,  // recommendedPrice - 나중에 설정
-                new ArrayList<>(),  // images
-                null,  // menus - 나중에 설정
-                null   // bizHour - 나중에 설정
+                (Long) row.get("id"),
+                (String) row.get("rid"),
+                (String) row.get("name"),
+                ((Number) row.get("x")).doubleValue(),
+                ((Number) row.get("y")).doubleValue(),
+                (String) row.get("category"),
+                (String) row.get("address"),
+                (String) row.get("road_address"),
+                null,
+                new ArrayList<>(),
+                null,
+                null
         );
     }
 }
