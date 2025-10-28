@@ -1,6 +1,7 @@
 package com.cjkim.kimjuim.restaurant.utils;
 
-import com.cjkim.kimjuim.restaurant.domain.BizHour;
+import com.cjkim.kimjuim.restaurant.dto.BizHourDto;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -23,55 +24,54 @@ public class BizHourUtils {
             "일", 7
     );
 
-    public static String getTodayBizHour(List<BizHour> bizHourList, LocalDateTime now) {
+    public static String getTodayBizHourFromDto(List<BizHourDto> bizHourList, LocalDateTime now) {
         // 매일
-        BizHour everydayBiz = bizHourList.stream()
-                .filter(b -> b.getDay().equals(EVERYDAY))
+        BizHourDto everydayBiz = bizHourList.stream()
+                .filter(b -> EVERYDAY.equals(b.day()))
                 .findFirst()
                 .orElse(null);
 
-        BizHour everydayBreak = bizHourList.stream()
-                .filter(b -> b.getBreakStart() != null)
+        BizHourDto everydayBreak = bizHourList.stream()
+                .filter(b -> b.breakStart() != null)
                 .findFirst()
                 .orElse(null);
 
         // 영업시간과 브레이크타임이 모두 존재한다면
         if (everydayBiz != null && everydayBreak != null) {
-            String bizStart = everydayBiz.getBizStart();
-            String bizEnd = everydayBiz.getBizEnd();
-            String breakStart = everydayBreak.getBreakStart();
-            String breakEnd = everydayBreak.getBizEnd();
-            return String.format(EVERYDAY_BIZ_WITH_BREAK_FORMAT, bizStart, bizEnd, breakStart, breakEnd);
+            return String.format(EVERYDAY_BIZ_WITH_BREAK_FORMAT,
+                    everydayBiz.bizStart(), everydayBiz.bizEnd(),
+                    everydayBreak.breakStart(), everydayBreak.breakEnd());
         }
 
         // 영업시간만 존재한다면
         if (everydayBiz != null) {
-            String bizStart = everydayBiz.getBizStart();
-            String bizEnd = everydayBiz.getBizEnd();
-            return String.format(EVERYDAY_BIZ_FORMAT, bizStart, bizEnd);
+            return String.format(EVERYDAY_BIZ_FORMAT,
+                    everydayBiz.bizStart(), everydayBiz.bizEnd());
         }
 
         // 월, 화, 수, 목, 금, 토, 일
-        BizHour dayBiz = bizHourList.stream()
-                .filter(b -> DAY_ORDER.get(b.getDay()) == now.getDayOfWeek().getValue())
+        BizHourDto dayBiz = bizHourList.stream()
+                .filter(b -> DAY_ORDER.get(b.day()) != null &&
+                        DAY_ORDER.get(b.day()) == now.getDayOfWeek().getValue())
                 .findFirst()
                 .orElse(null);
 
         if (dayBiz != null) {
-            String day = dayBiz.getDay();
-            String bizStart = dayBiz.getBizStart();
-            String bizEnd = dayBiz.getBizEnd();
-            String breakStart = dayBiz.getBreakStart();
-            String breakEnd = dayBiz.getBreakEnd();
+            String bizStart = dayBiz.bizStart();
+            String bizEnd = dayBiz.bizEnd();
+            String breakStart = dayBiz.breakStart();
+            String breakEnd = dayBiz.breakEnd();
 
             // 영업시간과 브레이크타임이 모두 존재한다면
             if (bizStart != null && bizEnd != null && breakStart != null && breakEnd != null) {
-                return String.format(DAY_BIZ_WITH_BREAK_FORMAT, day, bizStart, bizEnd, breakStart, breakEnd);
+                return String.format(DAY_BIZ_WITH_BREAK_FORMAT,
+                        dayBiz.day(), bizStart, bizEnd, breakStart, breakEnd);
             }
 
             // 영업시간만 존재한다면
             if (bizStart != null && bizEnd != null) {
-                return String.format(DAY_BIZ_FORMAT, day, bizStart, bizEnd);
+                return String.format(DAY_BIZ_FORMAT,
+                        dayBiz.day(), bizStart, bizEnd);
             }
         }
 

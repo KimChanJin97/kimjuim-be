@@ -6,8 +6,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,21 +50,21 @@ public class Restaurant {
     @Builder.Default
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
-    List<RestaurantImage> restaurantImages = new ArrayList<>();
+    Set<RestaurantImage> restaurantImages = new HashSet<>();
 
     @Builder.Default
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
-    List<Menu> menus = new ArrayList<>();
+    Set<Menu> menus = new HashSet<>();
 
     @Builder.Default
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
-    List<Review> reviews = new ArrayList<>();
+    Set<Review> reviews = new HashSet<>();
 
     @Builder.Default
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "restaurant")
-    List<BizHour> bizHours = new ArrayList<>();
+    Set<BizHour> bizHours = new HashSet<>();
 }
 

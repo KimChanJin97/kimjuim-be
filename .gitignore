@@ -31,3 +31,10 @@ Thumbs.db
 
 ### Environment / Config ###
 *.yml
+
+### Docker
+docker-compose.yml
+Dockerfile*
+
+## SQL
+*.sql

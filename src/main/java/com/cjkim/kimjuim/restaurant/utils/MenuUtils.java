@@ -1,10 +1,10 @@
 package com.cjkim.kimjuim.restaurant.utils;
 
-import com.cjkim.kimjuim.restaurant.domain.Menu;
-import com.cjkim.kimjuim.restaurant.domain.Restaurant;
+import com.cjkim.kimjuim.restaurant.dto.MenuDto;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MenuUtils {
 
@@ -12,23 +12,16 @@ public class MenuUtils {
     private static final String SEPARATOR = ", ";
     private static final String NO_MENU = "정보없음";
 
-    public static String getMenus(Restaurant restaurant) {
-        List<Menu> menus = restaurant.getMenus();
-        List<String> tmp = new ArrayList<>(10);
-
-        // 메뉴가 아예 존재하지 않을 경우
-        if (menus.size() < 1) {
+    // DTO용 오버로딩 메서드 추가
+    public static String getMenusFromDto(List<MenuDto> menus) {
+        if (menus == null || menus.isEmpty()) {
             return NO_MENU;
         }
 
-        for (Menu menu : menus) {
-            if (tmp.size() < MAX_SIZE) {
-                tmp.add(menu.getName());
-            } else {
-                break;
-            }
-        }
-        return String.join(SEPARATOR, tmp);
+        return menus.stream()
+                .sorted(Comparator.comparingInt(MenuDto::menuIdx))
+                .limit(MAX_SIZE)
+                .map(MenuDto::name)
+                .collect(Collectors.joining(SEPARATOR));
     }
 }
-

@@ -1,8 +1,10 @@
 package com.cjkim.kimjuim.restaurant.service;
 
+import com.cjkim.kimjuim.mapper.RestaurantQueryMapper;
 import com.cjkim.kimjuim.restaurant.dto.RestaurantDetailResponse;
-import com.cjkim.kimjuim.restaurant.dto.RestaurantNearbyResponses;
+import com.cjkim.kimjuim.restaurant.dto.RestaurantNearbyResponse;
 import com.cjkim.kimjuim.restaurant.repository.RestaurantRepository;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,17 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final RestaurantQueryMapper restaurantQueryMapper;
 
     @Transactional(readOnly = true)
-    public RestaurantNearbyResponses findRestaurantsNearby(
+    public List<RestaurantNearbyResponse> findRestaurantsNearby(
             double x,
             double y,
             double d,
             String[] ex
     ) {
-        return RestaurantNearbyResponses.from(
-                restaurantRepository.findRestaurantsNearby(x, y, d, ex),
-                LocalDateTime.now());
+        List<Object[]> queryResults = restaurantRepository.findRestaurantsNearby(x, y, d, ex);
+        return restaurantQueryMapper.mapToRestaurantDtos(queryResults, LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)

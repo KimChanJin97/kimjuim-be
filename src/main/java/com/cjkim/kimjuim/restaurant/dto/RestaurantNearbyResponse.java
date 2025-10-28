@@ -1,10 +1,6 @@
 package com.cjkim.kimjuim.restaurant.dto;
 
-import com.cjkim.kimjuim.restaurant.domain.Restaurant;
-import com.cjkim.kimjuim.restaurant.domain.RestaurantImage;
-import com.cjkim.kimjuim.restaurant.utils.*;
-
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public record RestaurantNearbyResponse(
@@ -16,25 +12,25 @@ public record RestaurantNearbyResponse(
         String category,
         String address,
         String roadAddress,
-        String recommendedPrice,
-        List<String> images,
-        String menus,
-        String bizHour
+        String recommendedPrice,    // 전처리된 가격
+        List<String> images,        // URL 문자열 리스트
+        String menus,               // 전처리된 메뉴 문자열
+        String bizHour              // 전처리된 영업시간
 ) {
-    public static RestaurantNearbyResponse from(Restaurant restaurant, LocalDateTime now) {
+    public static RestaurantNearbyResponse from(Object[] row) {
         return new RestaurantNearbyResponse(
-                restaurant.getId(),
-                restaurant.getRid(),
-                RestaurantUtils.getRestaurant(restaurant),
-                restaurant.getCoordinate().getX(),
-                restaurant.getCoordinate().getY(),
-                CategoryUtils.getCategory(restaurant.getCategory()),
-                restaurant.getAddress(),
-                restaurant.getRoadAddress(),
-                PriceUtils.getRecommendedPrice(restaurant),
-                restaurant.getRestaurantImages().stream().map(RestaurantImage::getUrl).toList(),
-                MenuUtils.getMenus(restaurant),
-                BizHourUtils.getTodayBizHour(restaurant.getBizHours(), now)
+                (Long) row[0],
+                (String) row[1],
+                (String) row[2],
+                ((Number) row[3]).doubleValue(),
+                ((Number) row[4]).doubleValue(),
+                (String) row[5],
+                (String) row[6],
+                (String) row[7],
+                null,  // recommendedPrice - 나중에 설정
+                new ArrayList<>(),  // images
+                null,  // menus - 나중에 설정
+                null   // bizHour - 나중에 설정
         );
     }
 }

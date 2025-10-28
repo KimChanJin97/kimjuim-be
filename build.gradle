@@ -40,6 +40,13 @@ dependencies {
 	implementation 'org.hibernate:hibernate-spatial:6.6.6.Final'
 	// configuration processor
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    // mail smtp
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // elastic search
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    // redis
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
 
 tasks.named('test') {
