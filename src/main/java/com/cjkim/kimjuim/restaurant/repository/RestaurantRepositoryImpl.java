@@ -27,6 +27,10 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
             double d,
             String[] ex
     ) {
+        // 미터를 각도로 변환 (위도 1도 ≈ 111,000m)
+        // geometry 타입의 ST_DWithin에서 Index Cond를 활용하기 위함
+        double distanceInDegrees = d / 111000.0;
+        
         String sql = """
             WITH nearby_restaurants AS (
                 SELECT 
@@ -44,9 +48,9 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                     ) as distance
                 FROM restaurant r
                 WHERE ST_DWithin(
-                      r.coordinate::geography,
-                      ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography,
-                      CAST(? AS double precision)
+                      r.coordinate,
+                      ST_SetSRID(ST_MakePoint(?, ?), 4326),
+                      ?
                     )
                     AND (CAST(? AS text[]) IS NULL OR r.rid <> ALL(CAST(? AS text[])))
                 ORDER BY r.coordinate <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)
@@ -117,7 +121,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
             ORDER BY nr.distance
             """;
 
-        List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, x, y, x, y, d, ex, ex, x, y);
+        List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, x, y, x, y, distanceInDegrees, ex, ex, x, y);
 
         return results;
     }
