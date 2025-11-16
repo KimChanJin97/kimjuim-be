@@ -27,7 +27,7 @@ public class RestaurantService {
             String[] ex
     ) {
         List<Map<String, Object>> queryResults = restaurantRepository.findRestaurantsNearby(x, y, d, ex);
-        return restaurantQueryMapper.mapToRestaurantDtos(queryResults, LocalDateTime.now());
+        return restaurantQueryMapper.mapToRestaurants(queryResults, LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)

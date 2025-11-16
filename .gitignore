@@ -38,3 +38,6 @@ Dockerfile*
 
 ## SQL
 *.sql
+
+## snapshots
+snapshots

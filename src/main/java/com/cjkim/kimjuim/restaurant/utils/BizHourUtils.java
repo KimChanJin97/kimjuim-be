@@ -24,7 +24,14 @@ public class BizHourUtils {
             "일", 7
     );
 
+    /**
+     * 오늘의 영업시간 반환
+     */
     public static String getTodayBizHourFromDto(List<BizHourDto> bizHourList, LocalDateTime now) {
+        if (bizHourList == null || bizHourList.isEmpty()) {
+            return NO_BIZ_HOUR;
+        }
+
         // 매일
         BizHourDto everydayBiz = bizHourList.stream()
                 .filter(b -> EVERYDAY.equals(b.day()))
@@ -51,7 +58,7 @@ public class BizHourUtils {
 
         // 월, 화, 수, 목, 금, 토, 일
         BizHourDto dayBiz = bizHourList.stream()
-                .filter(b -> DAY_ORDER.get(b.day()) != null &&
+                .filter(b -> b.day() != null && DAY_ORDER.get(b.day()) != null &&
                         DAY_ORDER.get(b.day()) == now.getDayOfWeek().getValue())
                 .findFirst()
                 .orElse(null);
