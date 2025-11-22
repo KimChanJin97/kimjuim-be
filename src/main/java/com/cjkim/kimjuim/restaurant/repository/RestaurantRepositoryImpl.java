@@ -27,50 +27,33 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
             double d,
             String[] ex
     ) {
-        // 미터를 각도로 변환 (위도 1도 ≈ 111,000m)
-        // geometry 타입의 ST_DWithin에서 Index Cond를 활용하기 위함
+        // Geometry 타입 + LATERAL JOIN 최적화
+        // - LATERAL JOIN으로 카테시안 곱 방지 (N+1 해결)
+        // - ST_Distance로 명시적 거리 계산 후 정렬
+        // - GIST 인덱스로 공간 검색 최적화
+        // - 5-10% 거리 오차는 음식점 검색에서 허용 가능
         double distanceInDegrees = d / 111000.0;
         
         String sql = """
-            WITH nearby_restaurants AS (
-                SELECT 
-                    r.id, 
-                    r.rid, 
-                    r.name, 
-                    ST_X(r.coordinate) as x, 
-                    ST_Y(r.coordinate) as y,
-                    r.category, 
-                    r.address, 
-                    r.road_address,
-                    ST_Distance(
-                        r.coordinate::geography,
-                        ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography
-                    ) as distance
-                FROM restaurant r
-                WHERE ST_DWithin(
-                      r.coordinate,
-                      ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                      ?
-                    )
-                    AND (CAST(? AS text[]) IS NULL OR r.rid <> ALL(CAST(? AS text[])))
-                ORDER BY r.coordinate <-> ST_SetSRID(ST_MakePoint(?, ?), 4326)
-            )
             SELECT 
-                nr.id,
-                nr.rid,
-                nr.name,
-                nr.x,
-                nr.y,
-                nr.category,
-                nr.address,
-                nr.road_address,
-                nr.distance,
+                r.id,
+                r.rid,
+                r.name,
+                ST_X(r.coordinate) as x,
+                ST_Y(r.coordinate) as y,
+                r.category,
+                r.address,
+                r.road_address,
+                ST_Distance(
+                    r.coordinate,
+                    ST_SetSRID(ST_MakePoint(?, ?), 4326)
+                ) * 111000.0 as distance,
                 
                 COALESCE(menus.data, '[]'::jsonb)::text as menus,
                 COALESCE(images.data, '[]'::jsonb)::text as images,
                 COALESCE(biz_hours.data, '[]'::jsonb)::text as biz_hours
                 
-            FROM nearby_restaurants nr
+            FROM restaurant r
             
             -- 메뉴 서브쿼리
             LEFT JOIN LATERAL (
@@ -85,7 +68,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                     ) ORDER BY m.menu_idx NULLS LAST
                 ) as data
                 FROM menu m
-                WHERE m.restaurant_id = nr.id
+                WHERE m.restaurant_id = r.id
             ) menus ON true
             
             -- 이미지 서브쿼리
@@ -97,7 +80,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                     ) ORDER BY ri.id
                 ) as data
                 FROM restaurant_image ri
-                WHERE ri.restaurant_id = nr.id
+                WHERE ri.restaurant_id = r.id
                 LIMIT 10
             ) images ON true
             
@@ -115,12 +98,23 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                     ) ORDER BY bh.day
                 ) as data
                 FROM biz_hour bh
-                WHERE bh.restaurant_id = nr.id
+                WHERE bh.restaurant_id = r.id
             ) biz_hours ON true
             
-            ORDER BY nr.distance
+            WHERE ST_DWithin(
+                r.coordinate,
+                ST_SetSRID(ST_MakePoint(?, ?), 4326),
+                ?
+            )
+            AND (CAST(? AS text[]) IS NULL OR r.rid <> ALL(CAST(? AS text[])))
+            
+            ORDER BY ST_Distance(
+                r.coordinate,
+                ST_SetSRID(ST_MakePoint(?, ?), 4326)
+            )
             """;
 
+        // 파라미터: x, y (ST_Distance), x, y (WHERE ST_DWithin), distanceInDegrees, ex, ex (제외 목록), x, y (ORDER BY)
         List<Map<String, Object>> results = jdbcTemplate.queryForList(sql, x, y, x, y, distanceInDegrees, ex, ex, x, y);
 
         return results;
@@ -132,37 +126,24 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
             return List.of();
         }
 
+        // LATERAL JOIN으로 카테시안 곱 방지
         String sql = """
-        WITH target_restaurants AS (
-            SELECT 
-                r.id, 
-                r.rid, 
-                r.name, 
-                ST_X(r.coordinate) as x, 
-                ST_Y(r.coordinate) as y,
-                r.category, 
-                r.address,
-                r.road_address,
-                array_position(?::bigint[], r.id) as sort_order
-            FROM restaurant r
-            WHERE r.id = ANY(?::bigint[])
-        )
         SELECT 
-            tr.id::bigint,
-            tr.rid,
-            tr.name,
-            tr.x::double precision,
-            tr.y::double precision,
-            tr.category,
-            tr.address,
-            tr.road_address,
-            tr.sort_order,
+            r.id::bigint,
+            r.rid,
+            r.name,
+            ST_X(r.coordinate)::double precision as x,
+            ST_Y(r.coordinate)::double precision as y,
+            r.category,
+            r.address,
+            r.road_address,
+            array_position(?::bigint[], r.id) as sort_order,
             
             COALESCE(menus.data, '[]'::jsonb)::text as menus,
             COALESCE(images.data, '[]'::jsonb)::text as images,
             COALESCE(biz_hours.data, '[]'::jsonb)::text as biz_hours
             
-        FROM target_restaurants tr
+        FROM restaurant r
         
         -- 메뉴 서브쿼리
         LEFT JOIN LATERAL (
@@ -177,7 +158,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                 ) ORDER BY m.menu_idx NULLS LAST
             ) as data
             FROM menu m
-            WHERE m.restaurant_id = tr.id
+            WHERE m.restaurant_id = r.id
         ) menus ON true
         
         -- 이미지 서브쿼리
@@ -189,7 +170,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                 ) ORDER BY ri.id
             ) as data
             FROM restaurant_image ri
-            WHERE ri.restaurant_id = tr.id
+            WHERE ri.restaurant_id = r.id
             LIMIT 10
         ) images ON true
         
@@ -207,13 +188,15 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
                 ) ORDER BY bh.day
             ) as data
             FROM biz_hour bh
-            WHERE bh.restaurant_id = tr.id
+            WHERE bh.restaurant_id = r.id
         ) biz_hours ON true
         
-        ORDER BY tr.sort_order NULLS LAST
+        WHERE r.id = ANY(?::bigint[])
+        
+        ORDER BY array_position(?::bigint[], r.id) NULLS LAST
         """;
 
         Long[] idsArray = ids.toArray(new Long[0]);
-        return jdbcTemplate.queryForList(sql, idsArray, idsArray);
+        return jdbcTemplate.queryForList(sql, idsArray, idsArray, idsArray);
     }
 }
