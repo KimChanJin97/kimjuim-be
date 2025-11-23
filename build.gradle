@@ -1,0 +1,51 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.cjkim'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// test
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// spring
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// jpa
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// postgresql
+    runtimeOnly("org.postgresql:postgresql")
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	// hibernate-spatial
+	implementation 'org.hibernate:hibernate-spatial:6.6.6.Final'
+	// configuration processor
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    // mail smtp
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // elastic search
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
