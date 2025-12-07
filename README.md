@@ -44,7 +44,7 @@
 
 <br/>
 
-### 1. 크롤러 개발
+### 1. 크롤러
 
 <br/>
 
@@ -61,9 +61,6 @@
 ![DFS Algorithm](./images/dfs.png)
 
 <br/>
-
----
-
 <br/>
 
 #### 📌 음식점 중복 크롤링 해결
@@ -94,9 +91,6 @@ if (RESTAURANT_IDS.contains(restaurantId)) {
 ```
 
 <br/>
-
----
-
 <br/>
 
 #### 📌 IP 차단 시 데이터 백업 및 복구 로직
@@ -114,9 +108,6 @@ if (RESTAURANT_IDS.contains(restaurantId)) {
 | ![Backup](./images/backup.png) |
 
 <br/>
-
----
-
 <br/>
 
 #### 📌 배치 삽입으로 저장 효율 개선
@@ -128,6 +119,12 @@ if (RESTAURANT_IDS.contains(restaurantId)) {
 - `AUTO_INCREMENT` 대신 **수동 PK 관리**로 INSERT 전 ID 확정
 - 메뉴 등 자식 엔티티에 FK 설정 후 **배치에 모아서 한 번에 INSERT**
 - 최대 **5,000개의 음식점**과 관련 데이터를 1번의 INSERT로 저장
+
+<br/>
+<br/>
+<br/>
+
+---
 
 <br/>
 <br/>
@@ -154,9 +151,6 @@ WHERE ST_DWithin(location, point, 500)
 → 쿼리 시간 **842ms**로 개선
 
 <br/>
-
----
-
 <br/>
 
 #### 📌 LEFT JOIN LATERAL + jsonb_agg로 카테시안 곱 해결
@@ -185,9 +179,6 @@ WHERE ST_DWithin(...)
 | **LEFT JOIN LATERAL + Geometry** | **879** | **49ms** |
 
 <br/>
-
----
-
 <br/>
 
 #### 📌 disMax 쿼리로 검색 정확도 개선
@@ -215,9 +206,6 @@ WHERE ST_DWithin(...)
 - **boost**: 주소(4) > 이름(3) = 카테고리(3) > 메뉴(2)
 
 <br/>
-
----
-
 <br/>
 
 #### 📌 검색 자동완성 - 필드 내 disMax 다중 쿼리
@@ -225,6 +213,12 @@ WHERE ST_DWithin(...)
 **해결 방법**
 - 키워드 완전 일치(20) > 토큰 일치(12) > 접두사 일치(6) > ngram 일치(5)
 - `edge_ngram_tokenizer` (min_gram=2, max_gram=10) 적용
+
+<br/>
+<br/>
+<br/>
+
+---
 
 <br/>
 <br/>
@@ -256,6 +250,12 @@ useEffect(() => {
   }
 }, [inView])
 ```
+
+<br/>
+<br/>
+<br/>
+
+---
 
 <br/>
 <br/>
