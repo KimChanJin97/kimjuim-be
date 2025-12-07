@@ -282,16 +282,16 @@ useEffect(() => {
 
 ```
 kimjuim/
-├── be/                    # Spring Boot 백엔드
-├── fe/kimjuim-fe/         # React 프론트엔드
-├── crawler/               # java 크롤러 소스코드 (미공개)
-├── docker/                # Docker 설정 파일 (미공개)
+├── be/                     # Spring Boot 백엔드
+├── fe/kimjuim-fe/          # React 프론트엔드
+├── crawler/                # java 크롤러 소스코드 (미공개)
+├── docker/                 # Docker 설정 파일 (미공개)
 │   ├── nginx/
 │   ├── postgres/
 │   ├── elasticsearch/
 │   └── spring/
-├── docker-compose.prod.yml
-└── deploy-prod.sh         # 배포 스크립트 (미공개)
+├── docker-compose.prod.yml # ec2에 카피할 도커 컴포즈 파일 (미공개)
+└── deploy-prod.sh          # 배포 스크립트 (미공개)
 ```
 
 [서버 소스코드](https://github.com/KimChanJin97/kimjuim-be)
