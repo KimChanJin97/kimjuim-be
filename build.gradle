@@ -44,6 +44,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     // elastic search
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    // logstash logback encoder (ELK 모니터링용)
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 }
 
 tasks.named('test') {
