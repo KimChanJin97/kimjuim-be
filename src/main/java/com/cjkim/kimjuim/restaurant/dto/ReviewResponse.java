@@ -1,6 +1,7 @@
 package com.cjkim.kimjuim.restaurant.dto;
 
 import com.cjkim.kimjuim.restaurant.domain.Review;
+import java.util.Base64;
 import java.util.Objects;
 
 import com.cjkim.kimjuim.restaurant.utils.ReviewUtils;
@@ -12,17 +13,22 @@ public record ReviewResponse(
         String title,
         String url,
         String authorName,
-        String profileUrl,
+        String profileImage,
         String content,
         String createdAt
 ) {
     public static ReviewResponse from(Review review) {
+        String profileImageBase64 = null;
+        if (review.getProfileImage() != null && review.getProfileImage().length > 0) {
+            profileImageBase64 = Base64.getEncoder().encodeToString(review.getProfileImage());
+        }
+        
         return new ReviewResponse(
                 review.getId(),
                 review.getTitle(),
                 review.getUrl(),
                 review.getAuthorName(),
-                review.getProfileUrl(),
+                profileImageBase64,
                 ReviewUtils.getContent(review),
                 review.getCreatedAt()
         );

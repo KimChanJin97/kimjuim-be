@@ -31,8 +31,8 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "profile_url", length = 2000)
-    private String profileUrl;
+    @Column(name = "profile_image")
+    private byte[] profileImage;
 
     @Column(name = "author_name")
     private String authorName;
